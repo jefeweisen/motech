@@ -66,7 +66,7 @@
     function findCurrentScope(startScope, functionName) {
         var parent = startScope;
 
-        while (!parent[functionName]) {
+        while (!parent.hasOwnProperty(functionName)) {
             parent = parent.$parent;
         }
 
