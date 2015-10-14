@@ -3890,7 +3890,7 @@
                 callback);
         };
 
-        $scope.subclassCurrent = null;
+        $scope.subclassCurrent = {};
 
         $scope.setAvailableFieldsForDisplay = function(scope) {
             var i;
@@ -3901,15 +3901,15 @@
                 }
             }
             var subclassnameCurrent = scope.$parent.$parent.$parent.subclassCurrent;
-            if(subclassnameCurrent) {
+            if(subclassnameCurrent && subclassnameCurrent.value) {
                 var entitiesT = scope.$parent.$parent.$parent.entitiesDerived;
-                var entitySelected = !entitiesT ? null : entitiesT.filter(function(e) {return e.name === subclassnameCurrent;})[0];
+                var entitySelected = !entitiesT ? null : entitiesT.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
                 var fieldsAdded1 = !entitySelected? null : entitySelected.fieldsAdded;
                 var fieldsAdded = fieldsAdded1.slice(6);  // TODO: remove hack
                 if(fieldsAdded && fieldsAdded.length>0) {
                     availableFieldsForDisplay = $scope.allEntityFields.concat(fieldsAdded);
                     var fdSubclass = availableFieldsForDisplay.filter(fd => fd.basic.name == "subclass")[0];
-                    fdSubclass.value = subclassnameCurrent;
+                    fdSubclass.value = subclassnameCurrent.value;
                     availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
                     availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
                     scope.$parent.$parent.$parent.availableFieldsForDisplay = availableFieldsForDisplay;

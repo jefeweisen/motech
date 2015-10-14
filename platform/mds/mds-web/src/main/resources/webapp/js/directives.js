@@ -2195,8 +2195,7 @@
             transclude: true,
             scope: true,
             controller: ['$scope', function ($scope) {
-                $scope.subclassCurrent = $scope.$parent.$parent.$parent.subclassCurrent;
-                console.log("rendering subclassCurrent: ",$scope.subclassCurrent);
+                $scope.subclassCurrent.value = $scope.$parent.$parent.$parent.subclassCurrent.value;
             }],
             templateUrl: '../mds/resources/partials/widgets/entityInstanceFields.html'
         };
@@ -2219,7 +2218,7 @@
                                 // and see if I can do something stylistically compatible, while not
                                 // giving up my plan to make the data browser be able to recurseively
                                 // display related instances.
-                                $scope.$parent.$parent.$parent.$parent.$parent.$parent.subclassCurrent = valueNew;
+                                $scope.$parent.$parent.$parent.$parent.$parent.$parent.subclassCurrent = {value: valueNew};
                                 $scope.setAvailableFieldsForDisplay($scope.$parent.$parent.$parent);
                             }, 0);
                         }
