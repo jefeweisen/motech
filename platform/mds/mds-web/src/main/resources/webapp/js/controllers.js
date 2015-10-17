@@ -3752,11 +3752,12 @@
         };
         $scope.addEntityInstanceBase = function (inst)
         {
+            var i,j;
             var values = inst.fields;
             angular.forEach (values, function(value, key) {
                 value.value = value.value === 'null' ? null : value.value;
             });
-            for(var i in inst.fields) {
+            for(i=0; i<inst.fields.length; i=i+1) {
                 var fd = inst.fields[i];
 
                 // {readonly, uiFilterable, . . .} = fields(FieldDto) - fields(FieldRecord)
@@ -3768,9 +3769,9 @@
                 // TODO: where is "discriminated" coming from?  Not isDiscriminated?
                 var entitiesDerived = fd.entitiesDerived;
                 if(entitiesDerived) {
-                    for (var j in entitiesDerived) {
+                    for(j=0; j<entitiesDerived.length; j=j+1) {
                         var e = entitiesDerived[j];
-                        delete e["discriminated"];
+                        delete e.discriminated;
                     }
                 }
             }
@@ -3909,7 +3910,7 @@
                 var fieldsAdded = fieldsAdded1.slice(6);  // TODO: remove hack
                 if(fieldsAdded && fieldsAdded.length>0) {
                     availableFieldsForDisplay = $scope.allEntityFields.concat(fieldsAdded);
-                    fdSubclass = availableFieldsForDisplay.filter(function(fd) {return (fd.basic.name === "subclass");})[0];
+                    var fdSubclass = availableFieldsForDisplay.filter(function(fd) {return (fd.basic.name === "subclass");})[0];
                     fdSubclass.value = subclassnameCurrent.value;
                     availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
                     availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
