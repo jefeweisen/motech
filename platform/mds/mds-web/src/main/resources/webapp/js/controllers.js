@@ -3979,22 +3979,14 @@
                             dbUserPreferences = $scope.getDataBrowserUserPreferencesCookie($scope.selectedEntity);
 
                         $scope.selectedFields = [];
-                       $scope.entitiesDerived = [];
-                       $scope.fieldsBase = [];
-                       var entitiesT = [];
 
                         // filter data from db
                         for (i = 0; i < data.length; i += 1) {
                             field = data[i];
-                            $scope.fieldsBase.push(field);
                             if ($.inArray(field.basic.name, dbUserPreferences.unselected) === -1) {
                                 $scope.selectedFields.push(field);
                             }
-                            if(field.entitiesDerived) {
-                                entitiesT = entitiesT.concat(field.entitiesDerived);
-                            }
                         }
-                       $scope.entitiesDerived = entitiesT;
 
                         // additional selections
                         for (i = 0; i < dbUserPreferences.selected.length; i += 1) {
