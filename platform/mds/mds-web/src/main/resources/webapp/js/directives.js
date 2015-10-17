@@ -2189,6 +2189,7 @@
         };
     });
 
+    // mnemonic: "eifs"
     directives.directive('entityInstanceFields2', function (Entities) {
         return {
             restrict: 'AE',
@@ -2212,14 +2213,11 @@
                         function(valueNew, valueOld) {
                         if(valueNew) {
                             $timeout(function() {
-                                // TODO: six parents is poor coupling with the template layouts.
-                                // I need to carefully review the recently written docs for reuse
-                                // of the data browser https://github.com/motech/motech/pull/100
-                                // and see if I can do something stylistically compatible, while not
-                                // giving up my plan to make the data browser be able to recurseively
-                                // display related instances.
-                                $scope.$parent.$parent.$parent.$parent.$parent.$parent.subclassCurrent = {value: valueNew};
-                                $scope.setAvailableFieldsForDisplay($scope.$parent.$parent.$parent);
+                                var scopeEifs = findCurrentScope($scope, "subclassCurrent");
+                                if(scopeEifs) {
+                                    scopeEifs.subclassCurrent = {value: valueNew};
+                                    $scope.setAvailableFieldsForDisplay(scopeEifs);
+                                }
                             }, 0);
                         }
                     });

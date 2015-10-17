@@ -3898,6 +3898,7 @@
 
         $scope.subclassCurrent = {};
 
+        // TODO: roll back "scope" argument for initial checkin?
         $scope.setAvailableFieldsForDisplay = function(scope) {
             var i;
             var availableFieldsForDisplay = [];
@@ -3906,9 +3907,9 @@
                     availableFieldsForDisplay.push(scope.allEntityFields[i]);
                 }
             }
-            var subclassnameCurrent = scope.$parent.$parent.$parent.subclassCurrent;
+            var subclassnameCurrent = scope.subclassCurrent;
             if(subclassnameCurrent && subclassnameCurrent.value) {
-                var entitiesT = scope.$parent.$parent.$parent.entitiesDerived;
+                var entitiesT = scope.entitiesDerived;
                 var entitySelected = !entitiesT ? null : entitiesT.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
                 var fieldsAdded1 = !entitySelected? null : entitySelected.fieldsAdded;
                 var fieldsAdded = fieldsAdded1.slice(6);  // TODO: remove hack
@@ -3918,10 +3919,9 @@
                     fdSubclass.value = subclassnameCurrent.value;
                     availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
                     availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
-                    scope.$parent.$parent.$parent.availableFieldsForDisplay = availableFieldsForDisplay;
-                    scope.$parent.$parent.$parent.fields = availableFieldsForDisplay;
-                    // TODO fix hack:
-                    scope.$parent.$parent.$parent.currentRecord.fields = availableFieldsForDisplay;
+                    scope.currentRecord.fields = availableFieldsForDisplay;
+                    scope.availableFieldsForDisplay = availableFieldsForDisplay;
+                    scope.fields = availableFieldsForDisplay;
                 }
             } else {
                 console.log("could not find subclassidCurrent");
