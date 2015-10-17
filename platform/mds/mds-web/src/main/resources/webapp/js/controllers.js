@@ -3737,7 +3737,8 @@
         };
 
         $scope.deriveIsDiscriminated = function (e) {
-            return !!(e.fields.filter(fd => fd.name === 'subclass')[0]);
+            return e && e.fields &&
+                !!(e.fields.filter(function(fd) {return (fd.name === 'subclass');})[0]);
         };
 
         /**
@@ -3908,7 +3909,7 @@
                 var fieldsAdded = fieldsAdded1.slice(6);  // TODO: remove hack
                 if(fieldsAdded && fieldsAdded.length>0) {
                     availableFieldsForDisplay = $scope.allEntityFields.concat(fieldsAdded);
-                    var fdSubclass = availableFieldsForDisplay.filter(fd => fd.basic.name == "subclass")[0];
+                    fdSubclass = availableFieldsForDisplay.filter(function(fd) {return (fd.basic.name === "subclass");})[0];
                     fdSubclass.value = subclassnameCurrent.value;
                     availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
                     availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
