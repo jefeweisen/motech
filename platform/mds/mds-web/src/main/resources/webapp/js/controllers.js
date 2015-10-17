@@ -3741,24 +3741,10 @@
                 !!(e.fields.filter(function(fd) {return (fd.name === 'subclass');})[0]);
         };
 
-        /**
-        *
-        * Saves the entity instance after the user clicks save
-        *
-        */
-        $scope.addEntityInstance = function () {
-            blockUI();
-            $scope.addEntityInstanceBase($scope.currentRecord);
-        };
-        $scope.addEntityInstanceBase = function (inst)
-        {
-            var i,j;
-            var values = inst.fields;
-            angular.forEach (values, function(value, key) {
-                value.value = value.value === 'null' ? null : value.value;
-            });
-            for(i=0; i<inst.fields.length; i=i+1) {
-                var fd = inst.fields[i];
+        function ReconcileFieldsOfInstTODO(inst) {
+            var e, i, j, fd;
+            for (i = 0; i < inst.fields.length; i = i + 1) {
+                fd = inst.fields[i];
 
                 // {readonly, uiFilterable, . . .} = fields(FieldDto) - fields(FieldRecord)
                 delete fd["readOnly"];
@@ -3775,12 +3761,30 @@
                     }
                 }
             }
+        }
 
-            inst.$save(function() {
+        function FillDefaultsOfInst(inst) {
+            var values = inst.fields;
+            angular.forEach(values, function (value, key) {
+                value.value = value.value === 'null' ? null : value.value;
+            });
+        }
+
+        /**
+         *
+         * Saves the entity instance after the user clicks save
+         *
+         */
+        $scope.addEntityInstance = function () {
+            blockUI();
+            FillDefaultsOfInst($scope.currentRecord);
+            ReconcileFieldsOfInstTODO($scope.currentRecord);
+            $scope.currentRecord.$save(function () {
                 $scope.unselectInstance();
                 unblockUI();
             }, angularHandler('mds.error', 'mds.error.cannotAddInstance'));
         };
+
 
         /**
         * Deletes an instance of the currently selected entity, with id "selected".
