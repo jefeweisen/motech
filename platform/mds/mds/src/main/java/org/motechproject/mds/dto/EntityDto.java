@@ -110,6 +110,27 @@ public class EntityDto {
         this.fieldsAdded = new LinkedList<FieldDto>();
     }
 
+    public EntityDto(EntityDto entity) {
+        this.id = entity.id;
+        this.className = entity.className;
+        this.name = entity.name;
+        this.module = entity.module;
+        this.namespace = entity.namespace;
+        this.tableName = entity.tableName;
+        this.recordHistory = entity.recordHistory;
+        this.securityMode = entity.securityMode;
+        this.securityMembers = entity.securityMembers;
+        this.readOnlySecurityMode = entity.readOnlySecurityMode;
+        this.readOnlySecurityMembers = entity.readOnlySecurityMembers;
+        this.readOnly = entity.readOnly;
+        this.superClass = entity.superClass;
+        this.abstractClass = entity.abstractClass;
+        this.isDiscriminated = entity.isDiscriminated;
+        this.securityOptionsModified = entity.securityOptionsModified;
+        this.bundleSymbolicName = entity.bundleSymbolicName;
+        this.fieldsAdded = entity.fieldsAdded;
+    }
+
     public Long getId() {
         return id;
     }

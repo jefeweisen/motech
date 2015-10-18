@@ -1040,13 +1040,13 @@ public class EntityServiceImpl implements EntityService {
             if(deriveds != null) {
                 for (EntityDto derived : deriveds) {
                     values.add(derived.getName());
-                    entitiesDerived.add(derived);
+                    entitiesDerived.add(new EntityDto(derived));
                     c++;
                 }
             }
             Set<String> fieldids = new HashSet<String>();
-            for(FieldDto fd : fieldDtos) {
-                fieldids.add(fd.getBasic().getName());
+            for(Field fd : entity.getFields()) {
+                fieldids.add(fd.getName());
             }
 
             for (EntityDto e : entitiesDerived) {

@@ -3911,8 +3911,7 @@
             if(subclassnameCurrent && subclassnameCurrent.value) {
                 var entitiesT = scope.entitiesDerived;
                 var entitySelected = !entitiesT ? null : entitiesT.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
-                var fieldsAdded1 = !entitySelected? null : entitySelected.fieldsAdded;
-                var fieldsAdded = fieldsAdded1.slice(6);  // TODO: remove hack
+                var fieldsAdded = !entitySelected? null : entitySelected.fieldsAdded;
                 if(fieldsAdded && fieldsAdded.length>0) {
                     availableFieldsForDisplay = $scope.allEntityFields.concat(fieldsAdded);
                     var fdSubclass = availableFieldsForDisplay.filter(function(fd) {return (fd.basic.name === "subclass");})[0];
