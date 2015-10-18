@@ -3908,20 +3908,22 @@
                 }
             }
             var subclassnameCurrent = scope.subclassCurrent;
-            if(subclassnameCurrent && subclassnameCurrent.value) {
-                var entitiesT = scope.entitiesDerived;
-                var entitySelected = !entitiesT ? null : entitiesT.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
-                var fieldsAdded = !entitySelected? null : entitySelected.fieldsAdded;
-                if(fieldsAdded && fieldsAdded.length>0) {
-                    availableFieldsForDisplay = $scope.allEntityFields.concat(fieldsAdded);
-                    var fdSubclass = availableFieldsForDisplay.filter(function(fd) {return (fd.basic.name === "subclass");})[0];
-                    fdSubclass.value = subclassnameCurrent.value;
-                    availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
-                    availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
-                    scope.currentRecord.fields = availableFieldsForDisplay;
-                    scope.availableFieldsForDisplay = availableFieldsForDisplay;
-                    scope.fields = availableFieldsForDisplay;
-                }
+            var fdSubclass = !scope.selectedFields ? null
+                : scope.selectedFields.filter(function(e) {return e.basic.name === "subclass";})[0];
+            if(subclassnameCurrent && subclassnameCurrent.value && fdSubclass) {
+                var entitiesDerived = fdSubclass.entitiesDerived;
+                var entityDerived = !entitiesDerived ? null : entitiesDerived.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
+                var fieldsAdded = !entityDerived? null : entityDerived.fieldsAdded;
+                availableFieldsForDisplay = []
+                    .concat(availableFieldsForDisplay)
+                    .concat(!fieldsAdded ? [] : fieldsAdded);
+                // Without "name", the page displays big red validation boxes:
+                availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
+                // Without "displayName", the page gets no labels:
+                availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
+                scope.currentRecord.fields = availableFieldsForDisplay;
+                scope.availableFieldsForDisplay = availableFieldsForDisplay;
+                scope.fields = availableFieldsForDisplay;
             } else {
                 console.log("could not find subclassidCurrent");
             }
