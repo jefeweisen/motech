@@ -3925,8 +3925,6 @@
                 scope.currentRecord.fields = availableFieldsForDisplay;
                 scope.availableFieldsForDisplay = availableFieldsForDisplay;
                 scope.fields = availableFieldsForDisplay;
-            } else {
-                console.log("could not find subclassidCurrent");
             }
         };
 
