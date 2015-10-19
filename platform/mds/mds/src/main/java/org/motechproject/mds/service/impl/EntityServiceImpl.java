@@ -1308,11 +1308,6 @@ public class EntityServiceImpl implements EntityService {
     @Override
     @Transactional
     public List<FieldDto> getDisplayFields(Long entityId) {
-        return getDisplayFieldsI(entityId, true);
-    }
-
-    // TODO: inline
-    private List<FieldDto> getDisplayFieldsI(Long entityId, boolean andPossible) {
         Entity entity = allEntities.retrieveById(entityId);
         assertEntityExists(entity, entityId);
 
@@ -1322,9 +1317,7 @@ public class EntityServiceImpl implements EntityService {
                 displayFields.add(field.toDto());
             }
         }
-        if(andPossible) {
-            EncodePseudofields(entity, displayFields);
-        }
+        EncodePseudofields(entity, displayFields);
 
         return displayFields;
     }
