@@ -3899,18 +3899,17 @@
 
         $scope.subclassCurrent = {};
 
-        // TODO: roll back "scope" argument for initial checkin?
-        $scope.setAvailableFieldsForDisplay = function(scope) {
+        $scope.setAvailableFieldsForDisplay = function() {
             var i;
             var availableFieldsForDisplay = [];
-            for (i = 0; i < scope.allEntityFields.length; i += 1) {
-                if (!scope.allEntityFields[i].nonDisplayable) {
-                    availableFieldsForDisplay.push(scope.allEntityFields[i]);
+            for (i = 0; i < $scope.allEntityFields.length; i += 1) {
+                if (!$scope.allEntityFields[i].nonDisplayable) {
+                    availableFieldsForDisplay.push($scope.allEntityFields[i]);
                 }
             }
-            var subclassnameCurrent = scope.subclassCurrent;
-            var fdSubclass = !scope.selectedFields ? null
-                : scope.selectedFields.filter(function(e) {return e.basic.name === "subclass";})[0];
+            var subclassnameCurrent = $scope.subclassCurrent;
+            var fdSubclass = !$scope.selectedFields ? null
+                : $scope.selectedFields.filter(function(e) {return e.basic.name === "subclass";})[0];
             if(subclassnameCurrent && subclassnameCurrent.value && fdSubclass) {
                 var entitiesDerived = fdSubclass.entitiesDerived;
                 var entityDerived = !entitiesDerived ? null : entitiesDerived.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
@@ -3922,9 +3921,9 @@
                 availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
                 // Without "displayName", the page gets no labels:
                 availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
-                scope.currentRecord.fields = availableFieldsForDisplay;
-                scope.availableFieldsForDisplay = availableFieldsForDisplay;
-                scope.fields = availableFieldsForDisplay;
+                $scope.currentRecord.fields = availableFieldsForDisplay;
+                $scope.availableFieldsForDisplay = availableFieldsForDisplay;
+                $scope.fields = availableFieldsForDisplay;
             }
         };
 
@@ -3943,7 +3942,7 @@
 
               $http.get('../mds/entities/'+$scope.selectedEntity.id+'/entityFields').success(function (data) {
                    $scope.allEntityFields = data;
-                   $scope.setAvailableFieldsForDisplay($scope);
+                   $scope.setAvailableFieldsForDisplay();
 
                    if ($routeParams.entityId === undefined) {
                       var hash = window.location.hash.substring(2, window.location.hash.length) + "/" + $scope.selectedEntity.id;
@@ -3998,7 +3997,7 @@
                             }
                         }
 
-                       $scope.setAvailableFieldsForDisplay($scope);
+                       $scope.setAvailableFieldsForDisplay();
                         $scope.updateInstanceGridFields();
                     });
 
