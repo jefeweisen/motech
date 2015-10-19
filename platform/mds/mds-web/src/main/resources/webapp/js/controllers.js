@@ -3742,6 +3742,8 @@
         };
 
         function ReconcileFieldsOfInstTODO(inst) {
+            // This function exists to turn FieldDto objects into FieldRecord objects.
+            // If FieldDto and FieldRecord are unified, this function should go away.
             var e, i, j, fd;
             for (i = 0; i < inst.fields.length; i = i + 1) {
                 fd = inst.fields[i];
@@ -3752,7 +3754,6 @@
                 delete fd["uiChanged"];
                 delete fd["lookups"];
 
-                // TODO: where is "discriminated" coming from?  Not isDiscriminated?
                 var entitiesDerived = fd.entitiesDerived;
                 if(entitiesDerived) {
                     for(j=0; j<entitiesDerived.length; j=j+1) {
