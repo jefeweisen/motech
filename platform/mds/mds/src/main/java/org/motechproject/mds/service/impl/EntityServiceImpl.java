@@ -1033,43 +1033,50 @@ public class EntityServiceImpl implements EntityService {
      */
     private void EncodePseudofields(Entity entity, List<FieldDto> fieldDtos) {
         if(entity.isDiscriminated()) {
-            List<String> values = new ArrayList<String>();
-            List<EntityDto> entitiesDerived = new ArrayList<>();
-            for (EntityDto derived : this.findEntitiesBySuperclass(entity.getClassName())) {
-                entitiesDerived.add(new EntityDto(derived));
-            }
-            Set<String> fieldidsBase = new HashSet<String>();
-            for(Field fd : entity.getFields()) {
-                fieldidsBase.add(fd.getName());
-            }
-
-            for (EntityDto e : entitiesDerived) {
-                List<FieldDto> fieldsAdded = new LinkedList<FieldDto>();
-                for (FieldDto fd2 : this.getFields(e.getId())) {
-                    if(!fieldidsBase.contains(fd2.getBasic().getName()))
-                        fieldsAdded.add(fd2);
-                }
-                e.setFieldsAdded(fieldsAdded);
-            }
-
-            for (EntityDto entityDerived : entitiesDerived) {
-                values.add(entityDerived.getName());
-            }
-            Type tD = allTypes.retrieveByClassName("java.util.Collection");
-            assert(tD != null);
-            FieldDto f = new FieldDto("subclass", "subclass", tD.toDto());
-            boolean allowMultipleSelections = false;
-            boolean allowUserSupplied = false;
-            List<SettingDto> list = new ArrayList<>();
-            list.add(new SettingDto(Constants.Settings.ALLOW_MULTIPLE_SELECTIONS, allowMultipleSelections));
-            list.add(new SettingDto(Constants.Settings.ALLOW_USER_SUPPLIED, allowUserSupplied));
-            list.add(new SettingDto(Constants.Settings.COMBOBOX_VALUES, values));
-            f.setSettings(list);
-            f.setNonDisplayable(false);
-            f.setNonEditable(false);
-            f.setEntitiesDerived(entitiesDerived);
+            FieldDto f = PseudofieldForDiscriminator(EntitiesForDiscriminator(entity));
             fieldDtos.add(f);
         }
+    }
+
+    private FieldDto PseudofieldForDiscriminator(List<EntityDto> entitiesDerived) {
+        List<String> values = new ArrayList<String>();
+        for (EntityDto entityDerived : entitiesDerived) {
+            values.add(entityDerived.getName());
+        }
+        Type tD = allTypes.retrieveByClassName("java.util.Collection");
+        assert(tD != null);
+        FieldDto f = new FieldDto("subclass", "subclass", tD.toDto());
+        boolean allowMultipleSelections = false;
+        boolean allowUserSupplied = false;
+        List<SettingDto> list = new ArrayList<>();
+        list.add(new SettingDto(Constants.Settings.ALLOW_MULTIPLE_SELECTIONS, allowMultipleSelections));
+        list.add(new SettingDto(Constants.Settings.ALLOW_USER_SUPPLIED, allowUserSupplied));
+        list.add(new SettingDto(Constants.Settings.COMBOBOX_VALUES, values));
+        f.setSettings(list);
+        f.setNonDisplayable(false);
+        f.setNonEditable(false);
+        f.setEntitiesDerived(entitiesDerived);
+        return f;
+    }
+
+    private List<EntityDto> EntitiesForDiscriminator(Entity entity) {
+        Set<String> fieldidsBase = new HashSet<String>();
+        for(Field fd : entity.getFields()) {
+            fieldidsBase.add(fd.getName());
+        }
+        List<EntityDto> entitiesDerived = new ArrayList<>();
+        for (EntityDto derived : this.findEntitiesBySuperclass(entity.getClassName())) {
+            entitiesDerived.add(new EntityDto(derived));
+        }
+        for (EntityDto e : entitiesDerived) {
+            List<FieldDto> fieldsAdded = new LinkedList<FieldDto>();
+            for (FieldDto fd2 : this.getFields(e.getId())) {
+                if(!fieldidsBase.contains(fd2.getBasic().getName()))
+                    fieldsAdded.add(fd2);
+            }
+            e.setFieldsAdded(fieldsAdded);
+        }
+        return entitiesDerived;
     }
 
     @Override
