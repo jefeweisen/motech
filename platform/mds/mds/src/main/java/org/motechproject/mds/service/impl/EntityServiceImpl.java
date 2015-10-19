@@ -1041,15 +1041,15 @@ public class EntityServiceImpl implements EntityService {
                 entitiesDerived.add(new EntityDto(derived));
                 c++;
             }
-            Set<String> fieldids = new HashSet<String>();
+            Set<String> fieldidsBase = new HashSet<String>();
             for(Field fd : entity.getFields()) {
-                fieldids.add(fd.getName());
+                fieldidsBase.add(fd.getName());
             }
 
             for (EntityDto e : entitiesDerived) {
                 List<FieldDto> fieldsAdded = new LinkedList<FieldDto>();
                 for (FieldDto fd2 : this.getFields(e.getId())) {
-                    if(!fieldids.contains(fd2.getBasic().getName()))
+                    if(!fieldidsBase.contains(fd2.getBasic().getName()))
                         fieldsAdded.add(fd2);
                 }
                 e.setFieldsAdded(fieldsAdded);
