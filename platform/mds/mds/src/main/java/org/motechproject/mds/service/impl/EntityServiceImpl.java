@@ -1035,11 +1035,9 @@ public class EntityServiceImpl implements EntityService {
         if(entity.isDiscriminated()) {
             List<String> values = new ArrayList<String>();
             List<EntityDto> entitiesDerived = new ArrayList<>();
-            int c=0;
             for (EntityDto derived : this.findEntitiesBySuperclass(entity.getClassName())) {
                 values.add(derived.getName());
                 entitiesDerived.add(new EntityDto(derived));
-                c++;
             }
             Set<String> fieldidsBase = new HashSet<String>();
             for(Field fd : entity.getFields()) {
