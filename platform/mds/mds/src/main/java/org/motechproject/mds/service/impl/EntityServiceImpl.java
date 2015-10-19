@@ -1059,7 +1059,6 @@ public class EntityServiceImpl implements EntityService {
             }
 
             Type tD = allTypes.retrieveByClassName("java.util.Collection");
-            // TODO: retrieveByClassName("org.motechproject.mds.domain.DiscriminatorAsType");
             assert(tD != null);
             FieldDto f = new FieldDto("subclass", "subclass", tD.toDto());
             boolean allowMultipleSelections = false;
