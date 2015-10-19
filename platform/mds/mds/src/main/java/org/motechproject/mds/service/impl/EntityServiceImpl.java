@@ -1036,13 +1036,10 @@ public class EntityServiceImpl implements EntityService {
             List<String> values = new ArrayList<String>();
             List<EntityDto> entitiesDerived = new ArrayList<>();
             int c=0;
-            List<EntityDto> deriveds = this.findEntitiesBySuperclass(entity.getClassName());
-            if(deriveds != null) {
-                for (EntityDto derived : deriveds) {
-                    values.add(derived.getName());
-                    entitiesDerived.add(new EntityDto(derived));
-                    c++;
-                }
+            for (EntityDto derived : this.findEntitiesBySuperclass(entity.getClassName())) {
+                values.add(derived.getName());
+                entitiesDerived.add(new EntityDto(derived));
+                c++;
             }
             Set<String> fieldids = new HashSet<String>();
             for(Field fd : entity.getFields()) {
