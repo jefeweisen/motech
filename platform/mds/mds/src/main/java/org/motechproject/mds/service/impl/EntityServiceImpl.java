@@ -1036,7 +1036,6 @@ public class EntityServiceImpl implements EntityService {
             List<String> values = new ArrayList<String>();
             List<EntityDto> entitiesDerived = new ArrayList<>();
             for (EntityDto derived : this.findEntitiesBySuperclass(entity.getClassName())) {
-                values.add(derived.getName());
                 entitiesDerived.add(new EntityDto(derived));
             }
             Set<String> fieldidsBase = new HashSet<String>();
@@ -1053,6 +1052,9 @@ public class EntityServiceImpl implements EntityService {
                 e.setFieldsAdded(fieldsAdded);
             }
 
+            for (EntityDto entityDerived : entitiesDerived) {
+                values.add(entityDerived.getName());
+            }
             Type tD = allTypes.retrieveByClassName("java.util.Collection");
             assert(tD != null);
             FieldDto f = new FieldDto("subclass", "subclass", tD.toDto());
