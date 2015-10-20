@@ -531,7 +531,6 @@ public final class Constants {
         public static final String ALLOW_MULTIPLE_SELECTIONS = "mds.form.label.allowMultipleSelections";
         public static final String ALLOW_USER_SUPPLIED = "mds.form.label.allowUserSupplied";
         public static final String COMBOBOX_VALUES = "mds.form.label.values";
-        public static final String COMBOBOX_DERIVED_ENTITIES = "mds.form.label.derivedEntities";
         public static final String STRING_MAX_LENGTH = "mds.form.label.maxTextLength";
         public static final String STRING_TEXT_AREA = "mds.form.label.textArea";
         public static final String TEXT_AREA_SQL_TYPE = "TEXT";

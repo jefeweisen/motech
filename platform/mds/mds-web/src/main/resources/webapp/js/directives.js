@@ -2189,7 +2189,6 @@
         };
     });
 
-    // mnemonic: "eifs"
     directives.directive('entityInstanceFields2', function (Entities) {
         return {
             restrict: 'AE',
