@@ -66,7 +66,7 @@
     function findCurrentScope(startScope, functionName) {
         var parent = startScope;
 
-        while (!parent[functionName]) {
+        while (!parent.hasOwnProperty(functionName)) {
             parent = parent.$parent;
         }
 
@@ -2186,6 +2186,43 @@
                     }
                 });
             }
+        };
+    });
+
+    directives.directive('entityInstanceFields2', function (Entities) {
+        return {
+            restrict: 'AE',
+            transclude: true,
+            scope: true,
+            controller: ['$scope', function ($scope) {
+                $scope.subclassCurrent.value = $scope.$parent.$parent.$parent.subclassCurrent.value;
+            }],
+            templateUrl: '../mds/resources/partials/widgets/entityInstanceFields.html'
+        };
+    });
+
+    directives.directive('entityInstanceField', function (Entities) {
+        return {
+            restrict: 'AE',
+            scope: true,
+            controller: ['$scope', '$timeout', function ($scope, $timeout) {
+                if($scope.field.name === 'subclass') {
+                    $scope.$watch(
+                        function() {return $scope.field.value;},
+                        function(valueNew, valueOld) {
+                        if(valueNew) {
+                            $timeout(function() {
+                                var scopeEifs = findCurrentScope($scope, "subclassCurrent");
+                                if(scopeEifs) {
+                                    scopeEifs.subclassCurrent = {value: valueNew};
+                                    $scope.setAvailableFieldsForDisplay(scopeEifs);
+                                }
+                            }, 0);
+                        }
+                    });
+                }
+            }],
+            templateUrl: '../mds/resources/partials/widgets/entityInstanceField.html'
         };
     });
 

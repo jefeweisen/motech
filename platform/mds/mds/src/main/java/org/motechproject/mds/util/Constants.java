@@ -324,6 +324,8 @@ public final class Constants {
          */
         public static final String NON_EDITABLE = "nonEditable";
 
+        public static final String DISCRIMINATED = "discriminated";
+
         /**
          * Constant <code>TABLE_NAME</code> corresponding to the @Entity attribute named {@code maxFetchDepth}
          */

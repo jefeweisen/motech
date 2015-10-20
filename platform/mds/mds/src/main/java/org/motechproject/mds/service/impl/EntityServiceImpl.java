@@ -74,6 +74,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -882,6 +883,40 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     @Transactional
+    public List<EntityDto> findEntitiesBySuperclass(String classnameSuper) {
+        List<EntityDto> entities = new ArrayList<>();
+
+        FilterValue filterValue1 = new FilterValue() {
+            @Override
+            public Object valueForQuery() {
+                return super.getValue();
+            }
+
+            @Override
+            public String paramTypeForQuery() {
+                return String.class.getName();
+            }
+
+            @Override
+            public List<String> operatorForQueryFilter() {
+                return Arrays.asList("==");
+            }
+        };
+        filterValue1.setValue(classnameSuper);
+        Filter filter1 = new Filter("superClass", new FilterValue[]{filterValue1});
+
+        for (Entity entity : allEntities.filter(new Filters(filter1), null, null)) {
+            if (entity.isActualEntity()) {
+                entities.add(entity.toDto());
+            }
+        }
+
+        return entities;
+    }
+
+
+    @Override
+    @Transactional
     public List<LookupDto> getEntityLookups(Long entityId) {
         return getLookups(entityId, false);
     }
@@ -907,6 +942,12 @@ public class EntityServiceImpl implements EntityService {
 
     @Override
     @Transactional
+    public List<FieldDto> getPossibleFields(Long entityId) {
+        return getFieldsPossible(entityId, true);
+    }
+
+    @Override
+    @Transactional
     public List<FieldDto> getEntityFields(Long entityId) {
         return getFields(entityId, false);
     }
@@ -924,13 +965,22 @@ public class EntityServiceImpl implements EntityService {
         return fieldDtos;
     }
 
+    private List<FieldDto> getFieldsPossible(Long entityId, boolean forDraft) {
+        return getFieldsI(entityId, forDraft, true);
+    }
+
     private List<FieldDto> getFields(Long entityId, boolean forDraft) {
+        return getFieldsI(entityId, forDraft, false);
+    }
+
+    private List<FieldDto> getFieldsI(Long entityId, boolean forDraft, boolean withPseudofields) {
         Entity entity = (forDraft) ? getEntityDraft(entityId) : allEntities.retrieveById(entityId);
 
         assertEntityExists(entity, entityId);
 
         // the returned collection is unmodifiable
         List<Field> fields = new ArrayList<>(entity.getFields());
+
 
         // for data browser purposes, we sort the fields by their ui display order
         if (!forDraft) {
@@ -964,7 +1014,69 @@ public class EntityServiceImpl implements EntityService {
             fieldDtos.add(field.toDto());
         }
 
+        if(withPseudofields) {
+            EncodePseudofields(entity, fieldDtos);
+        }
+
         return addNonPersistentFieldsData(fieldDtos, entity);
+    }
+
+    /***
+     * Adds display-only fields to the field list so that we can reuse UI widgets and
+     * wire protocol for editing entities with @Discriminated.
+     *
+     * One field is added for the discriminator.
+     * Once a discriminator is selected, the UI will expand the field list using fieldsAdded.
+     *
+     * Decode performed by:
+     *     org.motechproject.mds.web.service.impl.InstanceServiceImpl#DecodePseudofields
+     */
+    private void EncodePseudofields(Entity entity, List<FieldDto> fieldDtos) {
+        if(entity.isDiscriminated()) {
+            FieldDto f = PseudofieldForDiscriminator(EntitiesForDiscriminator(entity));
+            fieldDtos.add(f);
+        }
+    }
+
+    private FieldDto PseudofieldForDiscriminator(List<EntityDto> entitiesDerived) {
+        List<String> values = new ArrayList<String>();
+        for (EntityDto entityDerived : entitiesDerived) {
+            values.add(entityDerived.getName());
+        }
+        Type tD = allTypes.retrieveByClassName("java.util.Collection");
+        assert(tD != null);
+        FieldDto f = new FieldDto("subclass", "subclass", tD.toDto());
+        boolean allowMultipleSelections = false;
+        boolean allowUserSupplied = false;
+        List<SettingDto> list = new ArrayList<>();
+        list.add(new SettingDto(Constants.Settings.ALLOW_MULTIPLE_SELECTIONS, allowMultipleSelections));
+        list.add(new SettingDto(Constants.Settings.ALLOW_USER_SUPPLIED, allowUserSupplied));
+        list.add(new SettingDto(Constants.Settings.COMBOBOX_VALUES, values));
+        f.setSettings(list);
+        f.setNonDisplayable(false);
+        f.setNonEditable(false);
+        f.setEntitiesDerived(entitiesDerived);
+        return f;
+    }
+
+    private List<EntityDto> EntitiesForDiscriminator(Entity entity) {
+        Set<String> fieldidsBase = new HashSet<String>();
+        for(Field fd : entity.getFields()) {
+            fieldidsBase.add(fd.getName());
+        }
+        List<EntityDto> entitiesDerived = new ArrayList<>();
+        for (EntityDto derived : this.findEntitiesBySuperclass(entity.getClassName())) {
+            entitiesDerived.add(new EntityDto(derived));
+        }
+        for (EntityDto e : entitiesDerived) {
+            List<FieldDto> fieldsAdded = new LinkedList<FieldDto>();
+            for (FieldDto fd2 : this.getFields(e.getId())) {
+                if(!fieldidsBase.contains(fd2.getBasic().getName()))
+                    fieldsAdded.add(fd2);
+            }
+            e.setFieldsAdded(fieldsAdded);
+        }
+        return entitiesDerived;
     }
 
     @Override
@@ -1126,7 +1238,7 @@ public class EntityServiceImpl implements EntityService {
             for (TypeSetting setting : type.getSettings()) {
                 SettingDto settingDto = fieldDto.getSetting(setting.getName());
                 FieldSetting fieldSetting = new FieldSetting(field, setting);
-
+                // see also EntityServiceImpl.getFields(Long entityId, boolean forDraft)
                 if (null != settingDto) {
                     fieldSetting.setValue(settingDto.getValueAsString());
                 }
@@ -1209,6 +1321,7 @@ public class EntityServiceImpl implements EntityService {
                 displayFields.add(field.toDto());
             }
         }
+        EncodePseudofields(entity, displayFields);
 
         return displayFields;
     }

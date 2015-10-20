@@ -3736,24 +3736,56 @@
             }
         };
 
-        /**
-        *
-        * Saves the entity instance after the user clicks save
-        *
-        */
-        $scope.addEntityInstance = function () {
-            blockUI();
+        $scope.deriveIsDiscriminated = function (e) {
+            return e && e.fields &&
+                !!(e.fields.filter(function(fd) {return (fd.name === 'subclass');})[0]);
+        };
 
-            var values = $scope.currentRecord.fields;
-            angular.forEach (values, function(value, key) {
+        function ReconcileFieldsOfInstTODO(inst) {
+            // This function exists to turn FieldDto objects into FieldRecord objects.
+            // If FieldDto and FieldRecord are unified, this function should go away.
+            var e, i, j, fd;
+            for (i = 0; i < inst.fields.length; i = i + 1) {
+                fd = inst.fields[i];
+
+                // {readonly, uiFilterable, . . .} = fields(FieldDto) - fields(FieldRecord)
+                delete fd["readOnly"];
+                delete fd["uiFilterable"];
+                delete fd["uiChanged"];
+                delete fd["lookups"];
+
+                var entitiesDerived = fd.entitiesDerived;
+                if(entitiesDerived) {
+                    for(j=0; j<entitiesDerived.length; j=j+1) {
+                        var e = entitiesDerived[j];
+                        delete e.discriminated;
+                    }
+                }
+            }
+        }
+
+        function FillDefaultsOfInst(inst) {
+            var values = inst.fields;
+            angular.forEach(values, function (value, key) {
                 value.value = value.value === 'null' ? null : value.value;
             });
+        }
 
-            $scope.currentRecord.$save(function() {
+        /**
+         *
+         * Saves the entity instance after the user clicks save
+         *
+         */
+        $scope.addEntityInstance = function () {
+            blockUI();
+            FillDefaultsOfInst($scope.currentRecord);
+            ReconcileFieldsOfInstTODO($scope.currentRecord);
+            $scope.currentRecord.$save(function () {
                 $scope.unselectInstance();
                 unblockUI();
             }, angularHandler('mds.error', 'mds.error.cannotAddInstance'));
         };
+
 
         /**
         * Deletes an instance of the currently selected entity, with id "selected".
@@ -3865,13 +3897,33 @@
                 callback);
         };
 
+        $scope.subclassCurrent = {};
+
         $scope.setAvailableFieldsForDisplay = function() {
             var i;
-            $scope.availableFieldsForDisplay = [];
+            var availableFieldsForDisplay = [];
             for (i = 0; i < $scope.allEntityFields.length; i += 1) {
                 if (!$scope.allEntityFields[i].nonDisplayable) {
-                    $scope.availableFieldsForDisplay.push($scope.allEntityFields[i]);
+                    availableFieldsForDisplay.push($scope.allEntityFields[i]);
                 }
+            }
+            var subclassnameCurrent = $scope.subclassCurrent;
+            var fdSubclass = !$scope.selectedFields ? null
+                : $scope.selectedFields.filter(function(e) {return e.basic.name === "subclass";})[0];
+            if(subclassnameCurrent && subclassnameCurrent.value && fdSubclass) {
+                var entitiesDerived = fdSubclass.entitiesDerived;
+                var entityDerived = !entitiesDerived ? null : entitiesDerived.filter(function(e) {return e.name === subclassnameCurrent.value;})[0];
+                var fieldsAdded = !entityDerived? null : entityDerived.fieldsAdded;
+                availableFieldsForDisplay = []
+                    .concat(availableFieldsForDisplay)
+                    .concat(!fieldsAdded ? [] : fieldsAdded);
+                // Without "name", the page displays big red validation boxes:
+                availableFieldsForDisplay.map(function(fd) {fd.name = fd.basic.name ? fd.basic.name : ""});
+                // Without "displayName", the page gets no labels:
+                availableFieldsForDisplay.map(function(fd) {fd.displayName = fd.basic.displayName ? fd.basic.displayName : ""});
+                $scope.currentRecord.fields = availableFieldsForDisplay;
+                $scope.availableFieldsForDisplay = availableFieldsForDisplay;
+                $scope.fields = availableFieldsForDisplay;
             }
         };
 
@@ -3945,6 +3997,7 @@
                             }
                         }
 
+                       $scope.setAvailableFieldsForDisplay();
                         $scope.updateInstanceGridFields();
                     });
 
